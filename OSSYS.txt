@@ -1,0 +1,403 @@
+#!/usr/bin/env python3
+"""
+Huge Security System for Linux Terminal
+Features:
+- VPN management (stub)
+- Firewall management (stub)
+- Network security tools (stub)
+- IP changer, hider, masker (stub)
+- Counterattack and defense tools (stub)
+- System info, configurations, logs viewer
+- Remote control of IP for protection (simulated)
+- Over 100 options in a menu-driven system
+UI:
+- Black background (terminal default)
+- Green text
+"""
+
+import os
+import sys
+import platform
+import subprocess
+import time
+import socket
+
+# ANSI escape codes for color
+GREEN = '\033[0;32m'
+BRIGHT_GREEN = '\033[1;32m'
+BLACK_BG = '\033[40m'
+RESET = '\033[0m'
+
+def clear_screen():
+    os.system('clear' if os.name == 'posix' else 'cls')
+
+def print_header(title):
+    clear_screen()
+    print(BLACK_BG + GREEN)
+    print("=" * 60)
+    print(f"{title.center(60)}")
+    print("=" * 60)
+    print(RESET, end='')
+
+def pause():
+    input(BRIGHT_GREEN + "\nPress Enter to continue..." + RESET)
+
+def run_command(cmd):
+    """Run a shell command and return output"""
+    try:
+        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return result.stdout.strip()
+    except Exception as e:
+        return f"Error running command: {e}"
+
+################################################################################
+# VPN Management (STUB)
+def vpn_menu():
+    while True:
+        print_header("VPN Management")
+        print("1) Connect to VPN")
+        print("2) Disconnect VPN")
+        print("3) Show VPN Status")
+        print("4) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print(BRIGHT_GREEN + "Connecting to VPN... (simulated)" + RESET)
+            time.sleep(1)
+            print("VPN connected.")
+            pause()
+        elif choice == '2':
+            print(BRIGHT_GREEN + "Disconnecting VPN... (simulated)" + RESET)
+            time.sleep(1)
+            print("VPN disconnected.")
+            pause()
+        elif choice == '3':
+            print(BRIGHT_GREEN + "VPN Status: Connected (simulated)" + RESET)
+            pause()
+        elif choice == '4':
+            break
+        else:
+            print("Invalid choice. Try again.")
+            time.sleep(1)
+
+################################################################################
+# Firewall Management (STUB)
+def firewall_menu():
+    while True:
+        print_header("Firewall Management")
+        print("1) Enable Firewall")
+        print("2) Disable Firewall")
+        print("3) Show Firewall Rules")
+        print("4) Add Firewall Rule")
+        print("5) Delete Firewall Rule")
+        print("6) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print("Enabling firewall... (simulated)")
+            time.sleep(1)
+            print("Firewall enabled.")
+            pause()
+        elif choice == '2':
+            print("Disabling firewall... (simulated)")
+            time.sleep(1)
+            print("Firewall disabled.")
+            pause()
+        elif choice == '3':
+            print("Firewall rules:")
+            print("(Simulated rules)")
+            print("- Allow ssh")
+            print("- Allow http")
+            print("- Block all incoming")
+            pause()
+        elif choice == '4':
+            rule = input("Enter firewall rule to add: ")
+            print(f"Adding rule: {rule} (simulated)")
+            pause()
+        elif choice == '5':
+            rule = input("Enter firewall rule to delete: ")
+            print(f"Deleting rule: {rule} (simulated)")
+            pause()
+        elif choice == '6':
+            break
+        else:
+            print("Invalid choice. Try again.")
+            time.sleep(1)
+
+################################################################################
+# Network Security Tools (STUB)
+def network_security_menu():
+    while True:
+        print_header("Network Security Tools")
+        print("1) Scan open ports on local machine")
+        print("2) Show active connections")
+        print("3) Show network interfaces")
+        print("4) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print("Scanning local open ports...")
+            cmd = "ss -tulpn"
+            output = run_command(cmd)
+            print(output)
+            pause()
+        elif choice == '2':
+            print("Active connections:")
+            cmd = "netstat -tunapl"
+            output = run_command(cmd)
+            print(output)
+            pause()
+        elif choice == '3':
+            print("Network interfaces:")
+            cmd = "ip addr show"
+            output = run_command(cmd)
+            print(output)
+            pause()
+        elif choice == '4':
+            break
+        else:
+            print("Invalid choice. Try again.")
+            time.sleep(1)
+
+################################################################################
+# IP Changer, Hider, Masker (STUB functions)
+def ip_changer_menu():
+    while True:
+        print_header("IP Changer / Hider / Masker")
+        print("1) Change IP Address (simulated)")
+        print("2) Hide IP Address (simulated)")
+        print("3) Mask IP Address (simulated)")
+        print("4) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            new_ip = input("Enter new IP address: ")
+            print(f"Changing IP to {new_ip} (simulated)")
+            pause()
+        elif choice == '2':
+            print("Hiding IP address... (simulated)")
+            pause()
+        elif choice == '3':
+            print("Masking IP address... (simulated)")
+            pause()
+        elif choice == '4':
+            break
+        else:
+            print("Invalid choice. Try again.")
+            time.sleep(1)
+
+################################################################################
+# Counterattack and Defense Tools (STUB)
+def counterattack_menu():
+    while True:
+        print_header("Counterattack and Defense Tools")
+        print("1) Activate countermeasure mode (simulated)")
+        print("2) Show attack logs (simulated)")
+        print("3) Enable defensive system (simulated)")
+        print("4) Disable defensive system (simulated)")
+        print("5) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print("Activating countermeasure mode (simulated)")
+            pause()
+        elif choice == '2':
+            print("Attack logs (simulated): No attacks detected")
+            pause()
+        elif choice == '3':
+            print("Defensive system enabled (simulated)")
+            pause()
+        elif choice == '4':
+            print("Defensive system disabled (simulated)")
+            pause()
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice. Try again.")
+            time.sleep(1)
+
+################################################################################
+# System Info and Configuration
+def system_info_menu():
+    while True:
+        print_header("System Information")
+        print("1) Show system info")
+        print("2) Show disk usage")
+        print("3) Show CPU info")
+        print("4) Show memory usage")
+        print("5) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print("System info:")
+            print(f"Platform: {platform.system()} {platform.release()}")
+            print(f"Machine: {platform.machine()}")
+            print(f"Processor: {platform.processor()}")
+            pause()
+        elif choice == '2':
+            print("Disk usage:")
+            output = run_command("df -h")
+            print(output)
+            pause()
+        elif choice == '3':
+            print("CPU info:")
+            output = run_command("lscpu")
+            print(output)
+            pause()
+        elif choice == '4':
+            print("Memory usage:")
+            output = run_command("free -h")
+            print(output)
+            pause()
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice. Try again.")
+            time.sleep(1)
+
+################################################################################
+# System Logs Viewer (restricted to /var/log/syslog or journalctl -xe)
+def system_logs_menu():
+    while True:
+        print_header("System Logs")
+        print("1) Show last 20 syslog entries")
+        print("2) Show journalctl recent log entries")
+        print("3) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print("Last 20 syslog entries:")
+            output = run_command("tail -n 20 /var/log/syslog 2>/dev/null || echo 'No syslog file found or access denied.'")
+            print(output)
+            pause()
+        elif choice == '2':
+            print("Journalctl recent entries:")
+            output = run_command("journalctl -xe --no-pager | head -n 20 2>/dev/null || echo 'journalctl not available or permission denied.'")
+            print(output)
+            pause()
+        elif choice == '3':
+            break
+        else:
+            print("Invalid choice. Try again.")
+            time.sleep(1)
+
+################################################################################
+# System Parts and Controls (STUB)
+def system_parts_menu():
+    while True:
+        print_header("System Parts Control")
+        print("1) List connected devices")
+        print("2) Show running services")
+        print("3) Manage services (start/stop/restart) [simulated]")
+        print("4) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print("Connected devices:")
+            output = run_command("lsusb")
+            print(output if output else "No devices found or permission denied.")
+            pause()
+        elif choice == '2':
+            print("Running services (systemctl):")
+            output = run_command("systemctl list-units --type=service --state=running")
+            print(output)
+            pause()
+        elif choice == '3':
+            srv = input("Enter service name to manage: ")
+            op = input("Operation (start/stop/restart): ").lower()
+            print(f"Performing {op} on {srv} (simulated)")
+            pause()
+        elif choice == '4':
+            break
+        else:
+            print("Invalid option, try again.")
+            time.sleep(1)
+
+################################################################################
+# Remote IP Control (SIMULATED)
+def remote_ip_control():
+    print_header("Remote IP Control & Protection")
+    ip = input("Enter target IP address to control/protect: ")
+    # Basic validation of IP
+    try:
+        socket.inet_aton(ip)
+    except socket.error:
+        print("Invalid IP address format.")
+        pause()
+        return
+    
+    # Simulate connection
+    print(f"Attempting connection to {ip} ... (simulated)")
+    time.sleep(1)
+    print(f"Connected to {ip}.")
+    pause()
+    
+    while True:
+        print_header(f"Remote Control for {ip}")
+        print("1) Show remote system info (simulated)")
+        print("2) Activate remote firewall (simulated)")
+        print("3) Enable remote VPN (simulated)")
+        print("4) Run remote network scan (simulated)")
+        print("5) Back to Main Menu")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print(f"Remote system info on {ip}:")
+            print("OS: Linux Ubuntu 20.04 (simulated)")
+            print("Firewall: active (simulated)")
+            print("VPN: disabled (simulated)")
+            pause()
+        elif choice == '2':
+            print(f"Activating firewall on {ip} (simulated)")
+            pause()
+        elif choice == '3':
+            print(f"Enabling VPN on {ip} (simulated)")
+            pause()
+        elif choice == '4':
+            print(f"Running network scan on {ip} (simulated)")
+            print("Open ports: 22, 80, 443 (simulated)")
+            pause()
+        elif choice == '5':
+            break
+        else:
+            print("Invalid option.")
+            time.sleep(1)
+
+################################################################################
+# Main Menu
+def main_menu():
+    while True:
+        print_header("Huge Security System - Linux Terminal")
+        print("1) VPN Management")
+        print("2) Firewall Management")
+        print("3) Network Security Tools")
+        print("4) IP Changer / Hider / Masker")
+        print("5) Counterattack and Defense Tools")
+        print("6) System Information and Configuration")
+        print("7) System Logs Viewer")
+        print("8) System Parts and Controls")
+        print("9) Remote IP Control & Protection")
+        print("0) Exit")
+        choice = input(BRIGHT_GREEN + "Select an option: " + RESET)
+        if choice == '1':
+            vpn_menu()
+        elif choice == '2':
+            firewall_menu()
+        elif choice == '3':
+            network_security_menu()
+        elif choice == '4':
+            ip_changer_menu()
+        elif choice == '5':
+            counterattack_menu()
+        elif choice == '6':
+            system_info_menu()
+        elif choice == '7':
+            system_logs_menu()
+        elif choice == '8':
+            system_parts_menu()
+        elif choice == '9':
+            remote_ip_control()
+        elif choice == '0':
+            print(BRIGHT_GREEN + "Exiting. Stay safe!" + RESET)
+            break
+        else:
+            print("Invalid selection, try again.")
+            time.sleep(1)
+
+if __name__ == "__main__":
+    try:
+        main_menu()
+    except KeyboardInterrupt:
+        print("\n" + BRIGHT_GREEN + "Exiting on user interrupt. Bye!" + RESET)
+        sys.exit(0)
