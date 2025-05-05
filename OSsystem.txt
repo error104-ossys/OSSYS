@@ -1,0 +1,375 @@
+#!/usr/bin/env python3
+"""
+Real Linux Security Management System
+-------------------------------------
+A genuine terminal-based security system for Linux,
+providing real functional tools within ethical and practical limits.
+
+Features:
+- VPN management (OpenVPN via systemctl or direct config)
+- Firewall management (ufw/iptables)
+- Network security scanning (nmap)
+- IP address management (view/change IP using ip command)
+- System information & configuration
+- System logs viewing (journalctl)
+- System services control
+- Placeholder & warnings for advanced or sensitive features
+- Modular menu interface with many realistic options
+- Black terminal background with green text (ANSI escape codes)
+
+Note:
+- Must be run with appropriate permissions (sudo/root) for some operations.
+- Counterattack & offensive features are NOT included due to ethical/legal reasons.
+- Remote control of other systems is NOT implemented due to complexity and security risks.
+"""
+
+import os
+import sys
+import platform
+import subprocess
+import time
+import socket
+
+# ANSI color codes for green text on black background
+GREEN = '\033[0;32m'
+BRIGHT_GREEN = '\033[1;32m'
+RESET = '\033[0m'
+BLACK_BG = '\033[40m'
+
+def clear_screen():
+    os.system('clear')
+
+def print_header(title):
+    clear_screen()
+    print(BLACK_BG + GREEN)
+    print("=" * 65)
+    print(f"{title.center(65)}")
+    print("=" * 65)
+    print(RESET, end='')
+
+def pause():
+    input(BRIGHT_GREEN + "\nPress Enter to continue..." + RESET)
+
+def run_command(cmd, require_root=False):
+    """ Run command and return output or None if error. """
+    if require_root and os.geteuid() != 0:
+        print(BRIGHT_GREEN + "Error: This action requires root privileges. Please run with sudo or root." + RESET)
+        return None
+    try:
+        result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=30)
+        if result.returncode != 0:
+            print(BRIGHT_GREEN + f"Command error: {result.stderr.strip()}" + RESET)
+            return None
+        return result.stdout.strip()
+    except Exception as e:
+        print(BRIGHT_GREEN + f"Exception running command: {e}" + RESET)
+        return None
+
+##############################
+# VPN Management Module
+def vpn_menu():
+    while True:
+        print_header("VPN Management")
+        print("1) Start OpenVPN service (systemctl)")
+        print("2) Stop OpenVPN service (systemctl)")
+        print("3) VPN Status")
+        print("4) Connect to VPN with .ovpn config file")
+        print("5) Back")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            out = run_command("systemctl start openvpn@client", require_root=True)
+            print("OpenVPN service started." if out is not None else "Failed to start OpenVPN.")
+            pause()
+        elif choice == '2':
+            out = run_command("systemctl stop openvpn@client", require_root=True)
+            print("OpenVPN service stopped." if out is not None else "Failed to stop OpenVPN.")
+            pause()
+        elif choice == '3':
+            out = run_command("systemctl is-active openvpn@client")
+            status = out if out else "inactive or not available"
+            print(f"OpenVPN service status: {status}")
+            pause()
+        elif choice == '4':
+            config_path = input("Enter full path to OpenVPN .ovpn config file: ").strip()
+            if not os.path.isfile(config_path):
+                print("File not found; please enter a valid .ovpn config path.")
+                pause()
+            else:
+                cmd = f"sudo openvpn --config \"{config_path}\" --daemon"
+                out = run_command(cmd, require_root=True)
+                if out is None:
+                    print("Failed to start OpenVPN with given config.")
+                else:
+                    print("OpenVPN connected using config.")
+                pause()
+        elif choice == '5':
+            break
+        else:
+            print("Invalid option. Try again.")
+            time.sleep(1)
+
+##############################
+# Firewall Management Module
+def firewall_menu():
+    while True:
+        print_header("Firewall Management")
+        print("1) Enable UFW Firewall")
+        print("2) Disable UFW Firewall")
+        print("3) Show UFW status")
+        print("4) Add UFW allow rule")
+        print("5) Remove UFW rule")
+        print("6) Show iptables rules")
+        print("7) Back")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            out = run_command("ufw enable", require_root=True)
+            print("Firewall enabled." if out is not None else "Failed to enable firewall.")
+            pause()
+        elif choice == '2':
+            out = run_command("ufw disable", require_root=True)
+            print("Firewall disabled." if out is not None else "Failed to disable firewall.")
+            pause()
+        elif choice == '3':
+            out = run_command("ufw status verbose")
+            print(out if out else "Failed to get firewall status.")
+            pause()
+        elif choice == '4':
+            rule = input("Enter rule to allow (e.g. '22/tcp'): ").strip()
+            if rule == '':
+                print("Rule cannot be empty.")
+            else:
+                out = run_command(f"ufw allow {rule}", require_root=True)
+                print("Rule added." if out is not None else "Failed to add rule.")
+            pause()
+        elif choice == '5':
+            rule = input("Enter rule to delete (e.g. '22/tcp'): ").strip()
+            if rule == '':
+                print("Rule cannot be empty.")
+            else:
+                out = run_command(f"ufw delete allow {rule}", require_root=True)
+                print("Rule deleted." if out is not None else "Failed to delete rule.")
+            pause()
+        elif choice == '6':
+            out = run_command("iptables -L -v -n", require_root=True)
+            print(out if out else "Failed to show iptables rules.")
+            pause()
+        elif choice == '7':
+            break
+        else:
+            print("Invalid option. Try again.")
+            time.sleep(1)
+
+##############################
+# Network Security Module
+def network_security_menu():
+    while True:
+        print_header("Network Security Tools")
+        print("1) Scan open ports on target (using nmap)")
+        print("2) Show active connections")
+        print("3) Show network interfaces and IPs")
+        print("4) Back")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            target = input("Enter target IP or hostname: ").strip()
+            if target == '':
+                print("Target cannot be empty.")
+                pause()
+                continue
+            out = run_command(f"nmap -F {target}")
+            if out:
+                print(out)
+            else:
+                print("Nmap not installed or scan failed.")
+            pause()
+        elif choice == '2':
+            out = run_command("netstat -tunapl")
+            print(out if out else "Failed to retrieve active connections.")
+            pause()
+        elif choice == '3':
+            out = run_command("ip addr show")
+            print(out if out else "Failed to show interfaces.")
+            pause()
+        elif choice == '4':
+            break
+        else:
+            print("Invalid option. Try again.")
+            time.sleep(1)
+
+##############################
+# IP Address Management Module
+def ip_management_menu():
+    while True:
+        print_header("IP Management")
+        print("1) Show current IP addresses")
+        print("2) Change IP address on interface")
+        print("3) Mask IP by dropping all external packets (Warning!)")
+        print("4) Back")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            out = run_command("ip addr show")
+            print(out if out else "Failed to get IP addresses.")
+            pause()
+        elif choice == '2':
+            iface = input("Enter interface name (e.g. eth0): ").strip()
+            new_ip = input("Enter new IP address with CIDR (e.g. 192.168.1.100/24): ").strip()
+            if iface == '' or new_ip == '':
+                print("Both interface and IP are required.")
+                pause()
+                continue
+            flush = run_command(f"ip addr flush dev {iface}", require_root=True)
+            add = run_command(f"ip addr add {new_ip} dev {iface}", require_root=True)
+            if flush is None or add is None:
+                print("Failed to change IP address. Check permissions and input.")
+            else:
+                print(f"IPAddress changed to {new_ip} on {iface}.")
+            pause()
+        elif choice == '3':
+            confirm = input("This will DROP ALL incoming packets. Are you sure? (yes/no): ").lower()
+            if confirm == 'yes':
+                out = run_command("iptables -P INPUT DROP", require_root=True)
+                print("Incoming packets dropped. Undo with 'iptables -P INPUT ACCEPT'." if out else "Failed to drop packets.")
+            else:
+                print("Aborted.")
+            pause()
+        elif choice == '4':
+            break
+        else:
+            print("Invalid option. Try again.")
+            time.sleep(1)
+
+##############################
+# System Information & Logs Module
+def system_info_menu():
+    while True:
+        print_header("System Info & Logs")
+        print("1) Show system info")
+        print("2) Disk usage")
+        print("3) CPU info")
+        print("4) Memory usage")
+        print("5) Last 20 journalctl logs")
+        print("6) Back")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            print(f"Platform: {platform.system()} {platform.release()}")
+            print(f"Machine: {platform.machine()}")
+            print(f"Processor: {platform.processor()}")
+            pause()
+        elif choice == '2':
+            out = run_command("df -h")
+            print(out if out else "Failed to get disk usage.")
+            pause()
+        elif choice == '3':
+            out = run_command("lscpu")
+            print(out if out else "Failed to get CPU info.")
+            pause()
+        elif choice == '4':
+            out = run_command("free -h")
+            print(out if out else "Failed to get memory usage.")
+            pause()
+        elif choice == '5':
+            out = run_command("journalctl -n 20 --no-pager")
+            print(out if out else "Failed to retrieve logs.")
+            pause()
+        elif choice == '6':
+            break
+        else:
+            print("Invalid option. Try again.")
+            time.sleep(1)
+
+
+##############################
+# Services & Device Management Module
+def service_device_menu():
+    while True:
+        print_header("Services & Device Management")
+        print("1) List running services")
+        print("2) Start a service")
+        print("3) Stop a service")
+        print("4) Restart a service")
+        print("5) List USB devices")
+        print("6) Back")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            out = run_command("systemctl list-units --type=service --state=running")
+            print(out if out else "Failed to list running services.")
+            pause()
+        elif choice in ['2','3','4']:
+            svc = input("Enter service name (e.g. sshd): ").strip()
+            if svc == '':
+                print("Service name cannot be empty.")
+                pause()
+                continue
+            op = {'2': 'start', '3': 'stop', '4': 'restart'}[choice]
+            out = run_command(f"systemctl {op} {svc}", require_root=True)
+            print(f"Service {svc} {op}ed." if out is not None else f"Failed to {op} {svc}.")
+            pause()
+        elif choice == '5':
+            out = run_command("lsusb")
+            print(out if out else "Failed to list USB devices.")
+            pause()
+        elif choice == '6':
+            break
+        else:
+            print("Invalid option. Try again.")
+            time.sleep(1)
+
+##############################
+# Placeholder for Counterattack Tools
+def counterattack_menu():
+    print_header("Counterattack & Defense Tools")
+    print("WARNING: Offensive security or counterattack tools are NOT implemented due to legal and ethical reasons.")
+    print("Please use legitimate defense mechanisms and report attacks.")
+    pause()
+
+##############################
+# Placeholder for Remote IP system management
+def remote_ip_control_menu():
+    print_header("Remote IP Control & Protection")
+    print("Remote direct control of other machines is NOT implemented due to security and ethical reasons.")
+    print("Please use secure SSH or other remote admin tools for managing remote systems.")
+    pause()
+
+##############################
+# Main Menu
+def main_menu():
+    while True:
+        print_header("Linux Security Management System")
+        print("1) VPN Management")
+        print("2) Firewall Management")
+        print("3) Network Security Tools")
+        print("4) IP Address Management")
+        print("5) System Info & Logs")
+        print("6) Services & Device Management")
+        print("7) Counterattack & Defense Tools (Placeholder)")
+        print("8) Remote IP Control & Protection (Placeholder)")
+        print("0) Exit")
+        choice = input(BRIGHT_GREEN + "Choose an option: " + RESET)
+        if choice == '1':
+            vpn_menu()
+        elif choice == '2':
+            firewall_menu()
+        elif choice == '3':
+            network_security_menu()
+        elif choice == '4':
+            ip_management_menu()
+        elif choice == '5':
+            system_info_menu()
+        elif choice == '6':
+            service_device_menu()
+        elif choice == '7':
+            counterattack_menu()
+        elif choice == '8':
+            remote_ip_control_menu()
+        elif choice == '0':
+            print(BRIGHT_GREEN + "Exiting. Stay secure and safe!" + RESET)
+            break
+        else:
+            print("Invalid choice, try again.")
+            time.sleep(1)
+
+if __name__ == "__main__":
+    try:
+        main_menu()
+    except KeyboardInterrupt:
+        print("\n" + BRIGHT_GREEN + "Exiting on user interrupt. Goodbye!" + RESET)
+        sys.exit(0)
